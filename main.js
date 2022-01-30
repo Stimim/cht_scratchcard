@@ -175,6 +175,8 @@ $( document ).ready( () => {
     $( '#button-share' ).click( () => {
       const text = `${TODAY}\n${GUESS_HISTORY.join('\n')}`;
       navigator.clipboard.writeText(text);
+      $( '#message' ).text('遊戲歷程已複製到剪貼簿');
+      $( '#message' ).show();
     });
     $( '#dialog-help' ).dialog({
       position: {
