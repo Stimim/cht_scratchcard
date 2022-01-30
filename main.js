@@ -20,9 +20,7 @@ $( document ).ready( () => {
     now.setHours(0, 0, 0, 0);
 
     TODAY = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
-    const base = new Date();
-    base.setYear(2021, 1, 1);
-    base.setHours(0, 0, 0, 0);
+    const base = new Date(2021, 1, 1);
 
     const diff = now - base;
 
@@ -151,7 +149,6 @@ $( document ).ready( () => {
       GUESS_HISTORY,
       RESULT_HISTORY,
     }));
-    console.log('game_data: ', localStorage.game_data);
   }
 
   function LoadGame() {
@@ -170,7 +167,6 @@ $( document ).ready( () => {
     if (game_data.ANSWER !== ANSWER) {
       SaveGame();
     } else {
-      console.log(game_data);
       GUESS_HISTORY = game_data.GUESS_HISTORY;
       RESULT_HISTORY = game_data.RESULT_HISTORY;
       for (let guess of GUESS_HISTORY) {
