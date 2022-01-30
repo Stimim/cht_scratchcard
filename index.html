@@ -43,8 +43,52 @@
 
     #game {
       margin: 0 auto;
+      margin-top: 20px;
       width: 100%;
       max-width: 400px;
+      text-align: center;
+    }
+
+    @media only screen and (max-width: 992px) {
+      body {
+        font-size: 2rem;
+      }
+
+      #game {
+        max-width: 800px;
+      }
+
+      #game #title {
+        font-size: 2em;
+      }
+
+      #game * {
+        font-size: 2rem;
+      }
+
+
+      #dialog-help .header {
+        font-size: 4rem;
+      }
+
+      #dialog-help * {
+        font-size: 3rem;
+      }
+
+      #dialog-help {
+        width: 100%;
+      }
+
+      #button-github {
+        font-size: 2rem;
+      }
+    }
+
+
+
+    #game>div {
+      width: 100%;
+      max-width: 800px;
     }
 
     #text-input {
@@ -55,7 +99,7 @@
 
 <body>
   <div class="ui container">
-    <div id='game' style="text-align: center; margin-left: auto; margin-right: auto; margin-top: 20px;">
+    <div id='game'>
       <div class="ui four column centered grid">
         <div class="row">
           <div class="left floated left aligned column">
