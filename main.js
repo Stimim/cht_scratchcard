@@ -1,11 +1,10 @@
-$( document ).ready( () => {
-
+$(document).ready(() => {
   const DEFAULT_WIDTH = 2048;
-  const TEMPLATE_GUESS = document.querySelector('#template-guess');
+  const TEMPLATE_GUESS = document.querySelector("#template-guess");
   const STROKE_MAP = {};
   const COULD_BE_ANSWER = [];
   const MAX_STROKE = 15;
-  const FORMATTER = new Intl.NumberFormat('zh-TW', {style: 'percent'})
+  const FORMATTER = new Intl.NumberFormat("zh-TW", { style: "percent" });
 
   var ANSWER = null;
   var ANSWER_PATH = null;
@@ -15,12 +14,17 @@ $( document ).ready( () => {
   var GUESS_HISTORY = [];
   var RESULT_HISTORY = [];
 
+  const ShowWarningMessage = (message) => {
+    $("#invalid-message").text(message);
+    $("#invalid-message").show();
+  };
+
   function SelectAnswer() {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
     TODAY = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
-    const base = new Date(2021, 0, 1);  // month is 0-indexed...
+    const base = new Date(2021, 0, 1); // month is 0-indexed...
 
     const diff = now - base;
 
@@ -32,8 +36,8 @@ $( document ).ready( () => {
 
     // Draw the answer in memory, to count number of pixels
     const clone = TEMPLATE_GUESS.content.cloneNode(true);
-    const canvas = clone.querySelector('canvas');
-    const context = canvas.getContext('2d');
+    const canvas = clone.querySelector("canvas");
+    const context = canvas.getContext("2d");
     const scale = canvas.width / DEFAULT_WIDTH;
 
     context.scale(scale, scale);
@@ -43,11 +47,10 @@ $( document ).ready( () => {
     const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < image_data.data.length; i += 4) {
       if (image_data.data[i + 3] !== 0) {
-        ANSWER_PIXEL_COUNT ++;
+        ANSWER_PIXEL_COUNT++;
       }
     }
   }
-
 
   function CreatePath(word) {
     const stroke_list = STROKE_MAP[word];
@@ -73,25 +76,21 @@ $( document ).ready( () => {
     return path;
   }
 
-  function Guess(guess, replay=false) {
-    const message_element = $( '#message' );
+  function Guess(guess, replay = false) {
+    const message_element = $("#message");
     if (guess in STROKE_MAP) {
-      if (COULD_BE_ANSWER.indexOf(guess) >= 0) {
-        message_element.hide();
-      } else {
-        message_element.text(`「${guess}」筆順超過 ${MAX_STROKE} 畫。`);
-        message_element.show();
+      if (COULD_BE_ANSWER.indexOf(guess) < 0) {
+        ShowWarningMessage(`「${guess}」筆順超過 ${MAX_STROKE} 畫。`);
         return;
       }
     } else {
-      message_element.text(`「${guess}」不是常用字。`);
-      message_element.show();
+      ShowWarningMessage(`「${guess}」不是常用字。`);
       return;
     }
-    const div_result = $( '#result' );
+    const div_result = $("#result");
     const clone = TEMPLATE_GUESS.content.cloneNode(true);
-    const canvas = clone.querySelector('canvas');
-    const context = canvas.getContext('2d');
+    const canvas = clone.querySelector("canvas");
+    const context = canvas.getContext("2d");
     const scale = canvas.width / DEFAULT_WIDTH;
 
     context.scale(scale, scale);
@@ -108,24 +107,33 @@ $( document ).ready( () => {
     const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < image_data.data.length; i += 4) {
       if (image_data.data[i + 3] !== 0) {
-        pixel_count ++;
+        pixel_count++;
       }
     }
 
     context.stroke(path);
+    clone.id = `guess-${GUESS_HISTORY.length}`;
+    console.log(clone.id);
     div_result.append(clone);
+    $(`#${clone.id}`).transition("fade up");
 
     if (guess === ANSWER) {
       context.beginPath();
-      context.arc(DEFAULT_WIDTH - 256, DEFAULT_WIDTH - 256, 128, 0, 2*Math.PI);
+      context.arc(
+        DEFAULT_WIDTH - 256,
+        DEFAULT_WIDTH - 256,
+        128,
+        0,
+        2 * Math.PI
+      );
       context.lineWidth = 32;
-      context.strokeStyle = 'red';
+      context.strokeStyle = "red";
       context.stroke();
-      message_element.text('恭喜你答對了！');
+      message_element.text("恭喜你答對了！");
       message_element.show();
       if (!replay) {
         GUESS_HISTORY.push(guess);
-        RESULT_HISTORY.push('100%');
+        RESULT_HISTORY.push("100%");
         SaveGame();
       }
     } else {
@@ -143,16 +151,19 @@ $( document ).ready( () => {
   }
 
   function SaveGame() {
-    localStorage.setItem('game_data', JSON.stringify({
-      ANSWER,
-      TODAY,
-      GUESS_HISTORY,
-      RESULT_HISTORY,
-    }));
+    localStorage.setItem(
+      "game_data",
+      JSON.stringify({
+        ANSWER,
+        TODAY,
+        GUESS_HISTORY,
+        RESULT_HISTORY,
+      })
+    );
   }
 
   function LoadGame() {
-    if (typeof(Storage) === 'undefined') {
+    if (typeof Storage === "undefined") {
       // local storage is not supported.
       return;
     }
@@ -176,8 +187,8 @@ $( document ).ready( () => {
   }
 
   async function LoadWords() {
-    const request = new Request('./word_stroke.json');
-    const form = $( '#form-guess' );
+    const request = new Request("./word_stroke.json");
+    const form = $("#form-guess");
     form.hide();
     try {
       const response = await fetch(request);
@@ -197,44 +208,45 @@ $( document ).ready( () => {
       LoadGame();
 
       // Everything is ready, show form to start playing.
-      $( '#message' ).hide();
+      $("#message").hide();
       form.show();
-    } catch ( error ) {
+    } catch (error) {
       console.error(error);
     }
   }
 
   function OnDocumentReady() {
-    $( '#form-guess' ).submit(
-      (e) => {
-        e.preventDefault();
-
-        let guess = $( '#text-guess' ).val();
-        if (guess.length != 1) {
-          return;
-        }
-
-        Guess(guess);
+    $("#button-guess").click((e) => {
+      e.preventDefault();
+      const guess = $("#text-guess").val();
+      if (guess.length != 1) {
+        return;
       }
-    );
 
-    $( '#button-share' ).click( () => {
-      const text = `${TODAY}\n${RESULT_HISTORY.join('\n')}\n${location.href}`;
+      Guess(guess);
+    });
+
+    $("#text-guess").change(() => {
+      $("#invalid-message").hide();
+      const guess = $("#text-guess").val();
+
+      if (guess.length > 1) {
+        ShowWarningMessage("請輸入單一個字！");
+      }
+    });
+
+    $("#button-share").click(() => {
+      const text = `${TODAY}\n${RESULT_HISTORY.join("\n")}\n${location.href}`;
       navigator.clipboard.writeText(text);
-      $( '#message' ).text('遊戲歷程已複製到剪貼簿');
-      $( '#message' ).show();
-    });
-    $( '#dialog-help' ).dialog({
-      position: {
-        my: 'center top',
-        at: 'center bottom',
-        of: document.querySelector('header'),
-      }
-    });
-    $( '#button-help' ).click(() => {
-      $( '#dialog-help' ).dialog();
+      $("#message").text("遊戲歷程已複製到剪貼簿");
+      $("#message").show();
     });
 
+    $("#button-start").click(() => $("#dialog-help").modal("hide"));
+    $("#button-help").click(() => $("#dialog-help").modal("show"));
+
+    $("#invalid-message").hide();
+    $("#dialog-help").modal("show");
     LoadWords();
   }
 

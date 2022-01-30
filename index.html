@@ -1,94 +1,123 @@
 <html>
-  <head>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
-    <script src='https://code.jquery.com/jquery-3.6.0.min.js'></script>
-    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
-    <!-- To support random seed -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
-    <script src='main.js'></script>
 
-    <template id='template-guess'>
-      <div class='row'>
-        <div class='box'>
-          <canvas id='canvas' width=256 height=256></canvas>
-        </div>
-      </div>
-    </template>
+<head>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+  <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+  <!-- To support random seed -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+  <script src='./main.js'></script>
 
-    <style>
-      .box {
-        display: block;
-      }
-      .row {
-        text-align: center;
-      }
-      #form-guess {
-        text-align: center;
-      }
-      #message {
-        text-align: center;
-      }
-      #text-guess {
-        width: 4em;
-      }
-      header {
-        display: flex;
-        justify-content: space-between;
-      }
-
-      header #menu {
-        margin: auto;
-      }
-
-      #title {
-        font-size: 2em;
-        font-weight: bold;
-        text-align: center;
-      }
-
-      #game {
-        display: flex;
-        flex-direction: column;
-        margin: 0 auto;
-        width: 100%;
-        max-width: 400px;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id='game'>
-      <header>
-        <div id='menu'>
-          <button id='button-help' class=''>
-            說明
-          </button>
-        </div>
-
-        <div id='title'>國字刮刮樂</div>
-        <div id='menu'>
-          <button id='button-share' class=''>
-            分享
-          </button>
-        </div>
-      </header>
-      <div id='result'>
-      </div>
-      <form id='form-guess'>
-        請猜一個字：<input type='text' id='text-guess' maxlength=1 >
-        <input type='submit' value='送出' ><br>
-      </form>
-      <div id='message'>資料載入中...</div>
-    </div>
-
-    <div id='dialog-help' title='遊戲說明'>
-      <p>每次輸入一個中文字，顯示的結果為答案和輸入的重疊部分。</p>
-      <p>輸入的中文字必須是<a href='https://language.moe.gov.tw/result.aspx?classify_sn=23&subclassify_sn=437&content_sn=46' target=_blank>教育部常用字</a>，並且有筆畫數限制。</p>
-      <p><small>筆順資料來源：<a href='https://stroke-order.learningweb.moe.edu.tw/home.do' target=_blank>國字標準字體筆順學習網</a></small></p>
-      <hr>
-      <div style='text-align: right;'>
-        <small><a href='https://github.com/stimim/cht_scratchcard' target=_blank>Github Page</a></small>
+  <template id='template-guess'>
+    <div class='row'>
+      <div class='box'>
+        <canvas id='canvas' class="ui medium rounded image" width=256 height=256></canvas>
       </div>
     </div>
-  </body>
+  </template>
+
+  <style>
+    .box {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .box>canvas {
+      border: 1px solid gray;
+    }
+
+    .row {
+      text-align: center;
+    }
+
+    #message {
+      text-align: center;
+    }
+
+    #title {
+      font-weight: bold;
+      text-align: center;
+    }
+
+    #game {
+      margin: 0 auto;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    #text-input {
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ui container">
+    <div id='game' style="text-align: center; margin-left: auto; margin-right: auto; margin-top: 20px;">
+      <div class="ui four column centered grid">
+        <div class="row">
+          <div class="left floated left aligned column">
+            <button id="button-help" class="ui icon instagram button">
+              <i class="question icon"></i>
+            </button>
+          </div>
+          <div class="eight wide column">
+            <h1 id='title'>國字刮刮樂</h1>
+          </div>
+
+          <div class="right floated right aligned column">
+            <div class="right floated right aligned column">
+              <button id="button-share" class="ui icon instagram button">
+                <i class="share square icon"></i>
+              </button>
+            </div>
+          </div>
+          <div class="sixteen wide column">
+            <div id='result'>
+            </div>
+          </div>
+          <div class="sixteen wide column">
+            <form class="ui form">
+              <div class="field">
+                <div id="text-input" class="ui action input">
+                  <input id="text-guess" type="text" placeholder="猜一個字..." />
+                  <button id="button-guess" class="ui instagram button" type="submit">送出</button>
+                </div>
+                <div id="invalid-message" class="ui pointing red basic label" onkeyup="this.onchange();">
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id='message'>資料載入中...</div>
+      </div>
+      <div id="dialog-help" class="ui tiny modal" style="margin-left: auto; margin-right: auto;">
+        <div class="header">
+          國字刮刮樂
+          <button id="button-github" class="ui right floated labeled icon mini button"
+            onclick="window.open('https://github.com/stimim/cht_scratchcard', '_blank')">
+            <i class="github alternate icon"></i>
+            GitHub
+          </button>
+
+        </div>
+        <div class="content">
+          <h1>遊戲說明</h1>
+          <p>每次輸入一個中文字，顯示的結果為答案和輸入的重疊部分。</p>
+          <p>輸入的中文字必須是<a href='
+            https://language.moe.gov.tw/result.aspx?classify_sn=23&subclassify_sn=437&content_sn=46'
+              target=_blank>教育部常用字</a>，並且有筆畫數限制。</p>
+          <p><small>筆順資料來源：<a href='https://stroke-order.learningweb.moe.edu.tw/home.do'
+                target=_blank>國字標準字體筆順學習網</a></small>
+          </p>
+          <div>
+          </div>
+        </div>
+        <div id="button-start" class="ui bottom attached blue button">Start</div>
+      </div>
+    </div>
+</body>
+
 </html>
