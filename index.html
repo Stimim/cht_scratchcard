@@ -36,7 +36,12 @@
         justify-content: space-between;
       }
 
+      header #menu {
+        margin: auto;
+      }
+
       #title {
+        font-size: 2em;
         font-weight: bold;
         text-align: center;
       }
@@ -46,7 +51,7 @@
         flex-direction: column;
         margin: 0 auto;
         width: 100%;
-        max-width: 500px;
+        max-width: 400px;
       }
     </style>
   </head>
@@ -55,13 +60,17 @@
     <div id='game'>
       <header>
         <div id='menu'>
-          <button id='button-help' class='ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only'>
-            <span class='ui-button-icon-primary ui-icon ui-icon-help'></span>
+          <button id='button-help' class=''>
+            說明
           </button>
         </div>
 
         <div id='title'>國字刮刮樂</div>
-        <div id='menu'></div>
+        <div id='menu'>
+          <button id='button-share' class=''>
+            分享
+          </button>
+        </div>
       </header>
       <div id='result'>
       </div>
@@ -74,7 +83,7 @@
 
     <div id='dialog-help' title='遊戲說明'>
       <p>每次輸入一個中文字，顯示的結果為答案和輸入的重疊部分。</p>
-      <p>輸入的中文字必須是<a href='https://language.moe.gov.tw/result.aspx?classify_sn=23&subclassify_sn=437&content_sn=46' target=_blank>教育部常用字</a>。</p>
+      <p>輸入的中文字必須是<a href='https://language.moe.gov.tw/result.aspx?classify_sn=23&subclassify_sn=437&content_sn=46' target=_blank>教育部常用字</a>，並且有筆畫數限制。</p>
       <p><small>筆順資料來源：<a href='https://stroke-order.learningweb.moe.edu.tw/home.do' target=_blank>國字標準字體筆順學習網</a></small></p>
       <hr>
       <div style='text-align: right;'>

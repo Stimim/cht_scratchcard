@@ -4,15 +4,21 @@ $( document ).ready( () => {
   const TEMPLATE_GUESS = document.querySelector('#template-guess');
   const STROKE_MAP = {};
   const COULD_BE_ANSWER = [];
-  const MAX_STROKE = 100;
+  const MAX_STROKE = 15;
+  const FORMATTER = new Intl.NumberFormat('zh-TW', {style: 'percent'})
 
   var ANSWER = null;
   var ANSWER_PATH = null;
+  var ANSWER_PIXEL_COUNT = 0;
+  var TODAY = null;
+
+  var GUESS_HISTORY = [];
 
   function SelectAnswer() {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
 
+    TODAY = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
     const base = new Date();
     base.setYear(2021, 1, 1);
     base.setHours(0, 0, 0, 0);
@@ -24,6 +30,23 @@ $( document ).ready( () => {
     const index = Math.floor(COULD_BE_ANSWER.length * rng());
     ANSWER = COULD_BE_ANSWER[index];
     ANSWER_PATH = CreatePath(ANSWER);
+
+    // Draw the answer in memory, to count number of pixels
+    const clone = TEMPLATE_GUESS.content.cloneNode(true);
+    const canvas = clone.querySelector('canvas');
+    const context = canvas.getContext('2d');
+    const scale = canvas.width / DEFAULT_WIDTH;
+
+    context.scale(scale, scale);
+    context.fill(ANSWER_PATH);
+
+    ANSWER_PIXEL_COUNT = 0;
+    const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < image_data.data.length; i += 4) {
+      if (image_data.data[i + 3] !== 0) {
+        ANSWER_PIXEL_COUNT ++;
+      }
+    }
   }
 
 
@@ -77,18 +100,34 @@ $( document ).ready( () => {
 
     const path = CreatePath(guess);
 
-    context.stroke(path);
+    context.save();
     context.clip(ANSWER_PATH);
     context.fill(path);
+    context.restore();
 
+    let pixel_count = 0;
+    const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < image_data.data.length; i += 4) {
+      if (image_data.data[i + 3] !== 0) {
+        pixel_count ++;
+      }
+    }
+
+    context.stroke(path);
     div_result.append(clone);
 
     if (guess === ANSWER) {
       message_element.text('恭喜你答對了！');
       message_element.show();
+      GUESS_HISTORY.push('100%');
+    } else {
+      const percent = FORMATTER.format(pixel_count / ANSWER_PIXEL_COUNT);
+      message_element.text(`你透過「${guess}」看到 ${percent} 的答案。`);
+      message_element.show();
+      GUESS_HISTORY.push(percent);
     }
 
-    window.scrollTo(0,document.body.scrollHeight);
+    window.scrollTo(0, document.body.scrollHeight);
   }
 
   async function LoadWords() {
@@ -133,6 +172,10 @@ $( document ).ready( () => {
       }
     );
 
+    $( '#button-share' ).click( () => {
+      const text = `${TODAY}\n${GUESS_HISTORY.join('\n')}`;
+      navigator.clipboard.writeText(text);
+    });
     $( '#dialog-help' ).dialog({
       position: {
         my: 'center top',
@@ -148,5 +191,4 @@ $( document ).ready( () => {
   }
 
   OnDocumentReady();
-
 });
