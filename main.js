@@ -1,10 +1,10 @@
-const STROKE_MAP = {};
-const COULD_BE_ANSWER = [];
 $( document ).ready( () => {
 
   const DEFAULT_WIDTH = 2048;
   const TEMPLATE_GUESS = document.querySelector('#template-guess');
-  const MAX_STROKE = 20;
+  const STROKE_MAP = {};
+  const COULD_BE_ANSWER = [];
+  const MAX_STROKE = 100;
 
   var ANSWER = null;
   var ANSWER_PATH = null;
@@ -138,6 +138,17 @@ $( document ).ready( () => {
         Guess(guess);
       }
     );
+
+    $( '#dialog-help' ).dialog({
+      position: {
+        my: 'center top',
+        at: 'center bottom',
+        of: document.querySelector('header'),
+      }
+    });
+    $( '#button-help' ).click(() => {
+      $( '#dialog-help' ).dialog();
+    });
 
     LoadWords();
   }

@@ -1,6 +1,8 @@
 <html>
   <head>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
     <script src='https://code.jquery.com/jquery-3.6.0.min.js'></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
     <!-- To support random seed -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
     <script src='main.js'></script>
@@ -38,25 +40,40 @@
         font-weight: bold;
         text-align: center;
       }
+
+      #game {
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+        width: 100%;
+        max-width: 500px;
+      }
     </style>
   </head>
 
   <body>
-    <header>
-      <div id='menu'>
-        <button id='button-help'>?</button>
+    <div id='game'>
+      <header>
+        <div id='menu'>
+          <button id='button-help'>?</button>
+        </div>
+
+        <div id='title'>國字刮刮樂</div>
+        <div id='menu'></div>
+      </header>
+      <div id='result'>
       </div>
-
-      <div id='title'>國字刮刮樂</div>
-      <div id='menu'></div>
-    </header>
-    <div id='result'>
+      <form id='form-guess'>
+        請猜一個字：<input type='text' id='text-guess' maxlength=1 >
+        <input type='submit' value='送出' ><br>
+      </form>
+      <div id='message'>資料載入中...</div>
     </div>
-    <form id='form-guess'>
-      請猜一個字：<input type='text' id='text-guess' maxlength=1 >
-      <input type='submit' value='送出' ><br>
-    </form>
-    <div id='message'>資料載入中...</div>
 
+    <div id='dialog-help' title='遊戲說明'>
+      <p>每次輸入一個中文字，顯示的結果為答案和輸入的重疊部分。</p>
+      <p>輸入的中文字必須是<a href='https://language.moe.gov.tw/result.aspx?classify_sn=23&subclassify_sn=437&content_sn=46' target=_blank>教育部常用字</a>。</p>
+      <p><small>筆順資料來源：<a href='https://stroke-order.learningweb.moe.edu.tw/home.do' target=_blank>國字標準字體筆順學習網</a></small></p>
+    </div>
   </body>
 </html>
