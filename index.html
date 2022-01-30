@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <script src='https://code.jquery.com/jquery-3.6.0.min.js'></script>
+    <!-- To support random seed -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+    <script src='main.js'></script>
+
+    <template id='template-guess'>
+      <div class='row'>
+        <div class='box'>
+          <canvas id='canvas' width=256 height=256></canvas>
+        </div>
+      </div>
+    </template>
+
+    <style>
+      .box {
+        display: block;
+      }
+      .row {
+        text-align: center;
+      }
+      #form-guess {
+        text-align: center;
+      }
+      #message {
+        text-align: center;
+      }
+      #text-guess {
+        width: 4em;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      #title {
+        font-weight: bold;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div id='menu'>
+        <button id='button-help'>?</button>
+      </div>
+
+      <div id='title'>國字刮刮樂</div>
+      <div id='menu'></div>
+    </header>
+    <div id='result'>
+    </div>
+    <form id='form-guess'>
+      請猜一個字：<input type='text' id='text-guess' maxlength=1 >
+      <input type='submit' value='送出' ><br>
+    </form>
+    <div id='message'>資料載入中...</div>
+
+  </body>
+</html>
