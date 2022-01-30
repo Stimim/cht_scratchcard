@@ -23,7 +23,6 @@ $( document ).ready( () => {
 
     const index = Math.floor(COULD_BE_ANSWER.length * rng());
     ANSWER = COULD_BE_ANSWER[index];
-    console.log(ANSWER);
     ANSWER_PATH = CreatePath(ANSWER);
   }
 
@@ -99,7 +98,6 @@ $( document ).ready( () => {
     try {
       const response = await fetch(request);
       const json_object = await response.json();
-      console.log(Object.keys(json_object).length);
 
       for (word in json_object) {
         const stroke_list = json_object[word];
@@ -110,11 +108,8 @@ $( document ).ready( () => {
       }
 
       COULD_BE_ANSWER.sort();
-      console.log(COULD_BE_ANSWER.length);
 
       SelectAnswer();
-
-      console.log(ANSWER);
 
       // Everything is ready, show form to start playing.
       $( '#message' ).hide();
@@ -127,7 +122,6 @@ $( document ).ready( () => {
   function OnDocumentReady() {
     $( '#form-guess' ).submit(
       (e) => {
-        console.log(e);
         e.preventDefault();
 
         let guess = $( '#text-guess' ).val();
