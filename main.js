@@ -20,7 +20,7 @@ $( document ).ready( () => {
     now.setHours(0, 0, 0, 0);
 
     TODAY = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
-    const base = new Date(2021, 1, 1);
+    const base = new Date(2021, 0, 1);  // month is 0-indexed...
 
     const diff = now - base;
 
