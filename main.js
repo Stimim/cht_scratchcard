@@ -17,18 +17,11 @@ $( document ).ready( () => {
 
   function SelectAnswer() {
     const now = new Date();
-    now.setHours(0, 0, 0, 0);
-
     TODAY = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
-    const base = new Date();
-    base.setYear(2021, 1, 1);
-    base.setHours(0, 0, 0, 0);
 
-    const diff = now - base;
-
-    const rng = new Math.seedrandom(diff);
-
-    const index = Math.floor(COULD_BE_ANSWER.length * rng());
+    const rng = new Math.seedrandom(TODAY);
+    const random_number = rng();
+    const index = Math.floor(COULD_BE_ANSWER.length * random_number);
     ANSWER = COULD_BE_ANSWER[index];
     ANSWER_PATH = CreatePath(ANSWER);
 
@@ -151,7 +144,6 @@ $( document ).ready( () => {
       GUESS_HISTORY,
       RESULT_HISTORY,
     }));
-    console.log('game_data: ', localStorage.game_data);
   }
 
   function LoadGame() {
@@ -170,7 +162,6 @@ $( document ).ready( () => {
     if (game_data.ANSWER !== ANSWER) {
       SaveGame();
     } else {
-      console.log(game_data);
       GUESS_HISTORY = game_data.GUESS_HISTORY;
       RESULT_HISTORY = game_data.RESULT_HISTORY;
       for (let guess of GUESS_HISTORY) {
