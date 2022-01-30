@@ -13,6 +13,7 @@ $( document ).ready( () => {
   var TODAY = null;
 
   var GUESS_HISTORY = [];
+  var RESULT_HISTORY = [];
 
   function SelectAnswer() {
     const now = new Date();
@@ -74,7 +75,7 @@ $( document ).ready( () => {
     return path;
   }
 
-  function Guess(guess) {
+  function Guess(guess, replay=false) {
     const message_element = $( '#message' );
     if (guess in STROKE_MAP) {
       if (COULD_BE_ANSWER.indexOf(guess) >= 0) {
@@ -117,17 +118,65 @@ $( document ).ready( () => {
     div_result.append(clone);
 
     if (guess === ANSWER) {
+      context.beginPath();
+      context.arc(DEFAULT_WIDTH - 256, DEFAULT_WIDTH - 256, 128, 0, 2*Math.PI);
+      context.lineWidth = 32;
+      context.strokeStyle = 'red';
+      context.stroke();
       message_element.text('恭喜你答對了！');
       message_element.show();
-      GUESS_HISTORY.push('100%');
+      if (!replay) {
+        GUESS_HISTORY.push(guess);
+        RESULT_HISTORY.push('100%');
+        SaveGame();
+      }
     } else {
       const percent = FORMATTER.format(pixel_count / ANSWER_PIXEL_COUNT);
       message_element.text(`你透過「${guess}」看到 ${percent} 的答案。`);
       message_element.show();
-      GUESS_HISTORY.push(percent);
+      if (!replay) {
+        GUESS_HISTORY.push(guess);
+        RESULT_HISTORY.push(percent);
+        SaveGame();
+      }
     }
 
     window.scrollTo(0, document.body.scrollHeight);
+  }
+
+  function SaveGame() {
+    localStorage.setItem('game_data', JSON.stringify({
+      ANSWER,
+      TODAY,
+      GUESS_HISTORY,
+      RESULT_HISTORY,
+    }));
+    console.log('game_data: ', localStorage.game_data);
+  }
+
+  function LoadGame() {
+    if (typeof(Storage) === 'undefined') {
+      // local storage is not supported.
+      return;
+    }
+
+    let game_data = {};
+    try {
+      game_data = JSON.parse(localStorage.game_data);
+    } catch (error) {
+      game_data = {};
+    }
+
+    if (game_data.ANSWER !== ANSWER) {
+      SaveGame();
+    } else {
+      console.log(game_data);
+      GUESS_HISTORY = game_data.GUESS_HISTORY;
+      RESULT_HISTORY = game_data.RESULT_HISTORY;
+      for (let guess of GUESS_HISTORY) {
+        Guess(guess, true);
+      }
+    }
   }
 
   async function LoadWords() {
@@ -149,6 +198,7 @@ $( document ).ready( () => {
       COULD_BE_ANSWER.sort();
 
       SelectAnswer();
+      LoadGame();
 
       // Everything is ready, show form to start playing.
       $( '#message' ).hide();
@@ -173,7 +223,7 @@ $( document ).ready( () => {
     );
 
     $( '#button-share' ).click( () => {
-      const text = `${TODAY}\n${GUESS_HISTORY.join('\n')}`;
+      const text = `${TODAY}\n${RESULT_HISTORY.join('\n')}`;
       navigator.clipboard.writeText(text);
       $( '#message' ).text('遊戲歷程已複製到剪貼簿');
       $( '#message' ).show();
