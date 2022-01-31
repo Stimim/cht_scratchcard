@@ -27,15 +27,21 @@ $(document).ready(() => {
     const context = canvas.getContext("2d");
     const scale = canvas.width / DEFAULT_WIDTH;
 
+    // We need to put canvas on div, to make fillText work.
+    div_result.append(root);
+
     context.scale(scale, scale);
     context.lineWidth = 2;
 
-    const path = CreatePath(guess);
+    const font_size = 1920;
+    context.font = `100 ${font_size}px "Noto Sans TC", sans-serif`;
+    const {width} = context.measureText(answer);
+    const left = (DEFAULT_WIDTH - width) / 2;
+    context.textBaseline = "top";
 
-    context.save();
-    context.clip(ANSWER_PATH);
-    context.fill(path);
-    context.restore();
+    context.fillText(answer, left, 0);
+    context.globalCompositeOperation = "source-in";
+    context.fillText(guess, left, 0);
 
     let pixel_count = 0;
     const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -44,7 +50,9 @@ $(document).ready(() => {
         pixel_count++;
       }
     }
-    context.stroke(path);
+
+    context.globalCompositeOperation = "source-over";
+    context.strokeText(guess, left, 0);
 
     if (guess === ANSWER) {
       context.beginPath();
@@ -59,6 +67,8 @@ $(document).ready(() => {
       context.strokeStyle = "red";
       context.stroke();
     }
+
+    root.remove();
     return {clone: root, pixel_count};
   }
 
@@ -75,35 +85,10 @@ $(document).ready(() => {
 
     const index = Math.floor(COULD_BE_ANSWER.length * rng());
     ANSWER = COULD_BE_ANSWER[index];
-    ANSWER_PATH = CreatePath(ANSWER);
 
     const {pixel_count} = Draw(ANSWER, ANSWER);
 
     ANSWER_PIXEL_COUNT = pixel_count;
-  }
-
-  function CreatePath(word) {
-    const stroke_list = STROKE_MAP[word];
-    let path = new Path2D();
-    for (stroke of stroke_list) {
-      for (op of stroke) {
-        switch (op[0]) {
-          case 0:
-            path.moveTo(op[1], op[2]);
-            break;
-          case 1:
-            path.lineTo(op[1], op[2]);
-            break;
-          case 2:
-            path.quadraticCurveTo(op[1], op[2], op[3], op[4]);
-            break;
-          case 3:
-            path.bezierCurveTo(op[1], op[2], op[3], op[4], op[5], op[6]);
-            break;
-        }
-      }
-    }
-    return path;
   }
 
   function Guess(guess) {
