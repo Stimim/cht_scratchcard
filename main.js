@@ -6,6 +6,61 @@ $(document).ready(() => {
   const MAX_STROKE = 15;
   const FORMATTER = new Intl.NumberFormat("zh-TW", { style: "percent" });
 
+  //const ALPHABET = {
+    //"A": "Ａ",
+    //"B": "Ｂ",
+    //"C": "Ｃ",
+    //"D": "Ｄ",
+    //"E": "Ｅ",
+    //"F": "Ｆ",
+    //"G": "Ｇ",
+    //"H": "Ｈ",
+    //"I": "Ｉ",
+    //"J": "Ｊ",
+    //"K": "Ｋ",
+    //"L": "Ｌ",
+    //"M": "Ｍ",
+    //"N": "Ｎ",
+    //"O": "Ｏ",
+    //"P": "Ｐ",
+    //"Q": "Ｑ",
+    //"R": "Ｒ",
+    //"S": "Ｓ",
+    //"T": "Ｔ",
+    //"U": "Ｕ",
+    //"V": "Ｖ",
+    //"W": "Ｗ",
+    //"X": "Ｘ",
+    //"Y": "Ｙ",
+    //"Z": "Ｚ",
+    //"a": "ａ",
+    //"b": "ｂ",
+    //"c": "ｃ",
+    //"d": "ｄ",
+    //"e": "ｅ",
+    //"f": "ｆ",
+    //"g": "ｇ",
+    //"h": "ｈ",
+    //"i": "ｉ",
+    //"j": "ｊ",
+    //"k": "ｋ",
+    //"l": "ｌ",
+    //"m": "ｍ",
+    //"n": "ｎ",
+    //"o": "ｏ",
+    //"p": "ｐ",
+    //"q": "ｑ",
+    //"r": "ｒ",
+    //"s": "ｓ",
+    //"t": "ｔ",
+    //"u": "ｕ",
+    //"v": "ｖ",
+    //"w": "ｗ",
+    //"x": "ｘ",
+    //"y": "ｙ",
+    //"z": "ｚ",
+  //};
+
   var ANSWER = null;
   var ANSWER_PATH = null;
   var ANSWER_PIXEL_COUNT = 0;
@@ -34,7 +89,7 @@ $(document).ready(() => {
     context.lineWidth = 2;
 
     const font_size = 1920;
-    context.font = `100 ${font_size}px "Noto Sans TC", sans-serif`;
+    context.font = `100 ${font_size}px/${font_size} "Noto Sans TC", sans-serif`;
     const {width} = context.measureText(answer);
     const left = (DEFAULT_WIDTH - width) / 2;
     context.textBaseline = "top";
@@ -93,15 +148,18 @@ $(document).ready(() => {
 
   function Guess(guess) {
     const message_element = $("#message");
-    if (guess in STROKE_MAP) {
-      if (COULD_BE_ANSWER.indexOf(guess) < 0) {
-        ShowWarningMessage(`「${guess}」筆順超過 ${MAX_STROKE} 畫。`);
-        return;
-      }
-    } else {
-      ShowWarningMessage(`「${guess}」不是常用字。`);
-      return;
-    }
+    //if (guess in STROKE_MAP) {
+      //if (COULD_BE_ANSWER.indexOf(guess) < 0) {
+        //ShowWarningMessage(`「${guess}」筆順超過 ${MAX_STROKE} 畫。`);
+        //return;
+      //}
+    //} else {
+      //ShowWarningMessage(`「${guess}」不是常用字。`);
+      //return;
+    //}
+    //if (guess in ALPHABET) {
+      // guess = ALPHABET[guess];
+    //}
     const div_result = $("#result");
     const {clone, pixel_count} = Draw(guess, ANSWER);
     const clone_id = div_result.children().length;
