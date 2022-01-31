@@ -90,13 +90,21 @@ $(document).ready(() => {
 
     const font_size = 1920;
     context.font = `100 ${font_size}px/${font_size} "Noto Sans TC", sans-serif`;
-    const {width} = context.measureText(answer);
-    const left = (DEFAULT_WIDTH - width) / 2;
-    context.textBaseline = "top";
 
-    context.fillText(answer, left, 0);
+    {
+      const {width} = context.measureText(answer);
+      const left = (DEFAULT_WIDTH - width) / 2;
+      context.textBaseline = "top";
+      context.fillText(answer, left, 0);
+    }
+
     context.globalCompositeOperation = "source-in";
-    context.fillText(guess, left, 0);
+    {
+      const {width} = context.measureText(guess);
+      const left = (DEFAULT_WIDTH - width) / 2;
+      context.textBaseline = "top";
+      context.fillText(guess, left, 0);
+    }
 
     let pixel_count = 0;
     const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -107,7 +115,12 @@ $(document).ready(() => {
     }
 
     context.globalCompositeOperation = "source-over";
-    context.strokeText(guess, left, 0);
+    {
+      const {width} = context.measureText(guess);
+      const left = (DEFAULT_WIDTH - width) / 2;
+      context.textBaseline = "top";
+      context.strokeText(guess, left, 0);
+    }
 
     if (guess === ANSWER) {
       context.beginPath();
