@@ -19,6 +19,49 @@ $(document).ready(() => {
     $("#invalid-message").show();
   };
 
+  function Draw(guess, answer) {
+    const div_result = $("#result");
+    const clone = TEMPLATE_GUESS.content.cloneNode(true);
+    const root = clone.children[0];
+    const canvas = clone.querySelector("canvas");
+    const context = canvas.getContext("2d");
+    const scale = canvas.width / DEFAULT_WIDTH;
+
+    context.scale(scale, scale);
+    context.lineWidth = 2;
+
+    const path = CreatePath(guess);
+
+    context.save();
+    context.clip(ANSWER_PATH);
+    context.fill(path);
+    context.restore();
+
+    let pixel_count = 0;
+    const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < image_data.data.length; i += 4) {
+      if (image_data.data[i + 3] !== 0) {
+        pixel_count++;
+      }
+    }
+    context.stroke(path);
+
+    if (guess === ANSWER) {
+      context.beginPath();
+      context.arc(
+        DEFAULT_WIDTH - 256,
+        DEFAULT_WIDTH - 256,
+        128,
+        0,
+        2 * Math.PI
+      );
+      context.lineWidth = 32;
+      context.strokeStyle = "red";
+      context.stroke();
+    }
+    return {clone: root, pixel_count};
+  }
+
   function SelectAnswer() {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
@@ -34,22 +77,9 @@ $(document).ready(() => {
     ANSWER = COULD_BE_ANSWER[index];
     ANSWER_PATH = CreatePath(ANSWER);
 
-    // Draw the answer in memory, to count number of pixels
-    const clone = TEMPLATE_GUESS.content.cloneNode(true);
-    const canvas = clone.querySelector("canvas");
-    const context = canvas.getContext("2d");
-    const scale = canvas.width / DEFAULT_WIDTH;
+    const {pixel_count} = Draw(ANSWER, ANSWER);
 
-    context.scale(scale, scale);
-    context.fill(ANSWER_PATH);
-
-    ANSWER_PIXEL_COUNT = 0;
-    const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < image_data.data.length; i += 4) {
-      if (image_data.data[i + 3] !== 0) {
-        ANSWER_PIXEL_COUNT++;
-      }
-    }
+    ANSWER_PIXEL_COUNT = pixel_count;
   }
 
   function CreatePath(word) {
@@ -76,7 +106,7 @@ $(document).ready(() => {
     return path;
   }
 
-  function Guess(guess, replay = false) {
+  function Guess(guess) {
     const message_element = $("#message");
     if (guess in STROKE_MAP) {
       if (COULD_BE_ANSWER.indexOf(guess) < 0) {
@@ -88,63 +118,27 @@ $(document).ready(() => {
       return;
     }
     const div_result = $("#result");
-    const clone = TEMPLATE_GUESS.content.cloneNode(true);
-    const canvas = clone.querySelector("canvas");
-    const context = canvas.getContext("2d");
-    const scale = canvas.width / DEFAULT_WIDTH;
-
-    context.scale(scale, scale);
-    context.lineWidth = 2;
-
-    const path = CreatePath(guess);
-
-    context.save();
-    context.clip(ANSWER_PATH);
-    context.fill(path);
-    context.restore();
-
-    let pixel_count = 0;
-    const image_data = context.getImageData(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < image_data.data.length; i += 4) {
-      if (image_data.data[i + 3] !== 0) {
-        pixel_count++;
-      }
-    }
-
-    context.stroke(path);
-    clone.id = `guess-${GUESS_HISTORY.length}`;
+    const {clone, pixel_count} = Draw(guess, ANSWER);
+    const clone_id = div_result.children().length;
+    clone.id = `guess-${clone_id}`;
     console.log(clone.id);
     div_result.append(clone);
-    $(`#${clone.id}`).transition("fade up");
+
+    $(clone).css({opacity: 0}).appendTo(div_result).animate({opacity: 1});
 
     if (guess === ANSWER) {
-      context.beginPath();
-      context.arc(
-        DEFAULT_WIDTH - 256,
-        DEFAULT_WIDTH - 256,
-        128,
-        0,
-        2 * Math.PI
-      );
-      context.lineWidth = 32;
-      context.strokeStyle = "red";
-      context.stroke();
       message_element.text("恭喜你答對了！");
       message_element.show();
-      if (!replay) {
-        GUESS_HISTORY.push(guess);
-        RESULT_HISTORY.push("100%");
-        SaveGame();
-      }
+      GUESS_HISTORY.push(guess);
+      RESULT_HISTORY.push("100%");
+      SaveGame();
     } else {
       const percent = FORMATTER.format(pixel_count / ANSWER_PIXEL_COUNT);
       message_element.text(`你透過「${guess}」看到 ${percent} 的答案。`);
       message_element.show();
-      if (!replay) {
-        GUESS_HISTORY.push(guess);
-        RESULT_HISTORY.push(percent);
-        SaveGame();
-      }
+      GUESS_HISTORY.push(guess);
+      RESULT_HISTORY.push(percent);
+      SaveGame();
     }
 
     window.scrollTo(0, document.body.scrollHeight);
@@ -178,10 +172,8 @@ $(document).ready(() => {
     if (game_data.ANSWER !== ANSWER) {
       SaveGame();
     } else {
-      GUESS_HISTORY = game_data.GUESS_HISTORY;
-      RESULT_HISTORY = game_data.RESULT_HISTORY;
-      for (let guess of GUESS_HISTORY) {
-        Guess(guess, true);
+      for (let guess of game_data.GUESS_HISTORY) {
+        Guess(guess);
       }
     }
   }
