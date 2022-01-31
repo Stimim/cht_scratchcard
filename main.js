@@ -30,7 +30,7 @@ $(document).ready(() => {
     context.scale(scale, scale);
     context.lineWidth = 2;
 
-    const path = CreatePath(guess);
+    const path = guess === answer ? ANSWER_PATH : CreatePath(guess);
 
     context.save();
     context.clip(ANSWER_PATH);
@@ -86,22 +86,47 @@ $(document).ready(() => {
     const stroke_list = STROKE_MAP[word];
     let path = new Path2D();
     for (stroke of stroke_list) {
+      let current_path = new Path2D();
+      let min_x = DEFAULT_WIDTH;
+      let max_x = 0;
+      let min_y = DEFAULT_WIDTH;
+      let max_y = 0;
+      const UpdateMinMax = (x, y) => {
+        min_x = Math.min(min_x, x);
+        max_x = Math.max(max_x, x);
+        min_y = Math.min(min_y, y);
+        max_y = Math.max(max_y, y);
+      };
       for (op of stroke) {
         switch (op[0]) {
           case 0:
-            path.moveTo(op[1], op[2]);
+            current_path.moveTo(op[1], op[2]);
+            UpdateMinMax(op[1], op[2]);
             break;
           case 1:
-            path.lineTo(op[1], op[2]);
+            current_path.lineTo(op[1], op[2]);
+            UpdateMinMax(op[1], op[2]);
             break;
           case 2:
-            path.quadraticCurveTo(op[1], op[2], op[3], op[4]);
+            current_path.quadraticCurveTo(op[1], op[2], op[3], op[4]);
+            UpdateMinMax(op[3], op[4]);
             break;
           case 3:
-            path.bezierCurveTo(op[1], op[2], op[3], op[4], op[5], op[6]);
+            current_path.bezierCurveTo(op[1], op[2], op[3], op[4], op[5], op[6]);
+            UpdateMinMax(op[5], op[6]);
             break;
         }
       }
+      const matrix = new DOMMatrix();
+      matrix.a = 1;
+      matrix.b = 0;
+      matrix.c = 0;
+      matrix.d = 1;
+      matrix.e = -min_x + Math.random() * (DEFAULT_WIDTH - max_x + min_x); // shift X
+      matrix.f = -min_y + Math.random() * (DEFAULT_WIDTH - max_y + min_y); // shift Y
+      console.log(min_x, min_y);
+
+      path.addPath(current_path, matrix);
     }
     return path;
   }
