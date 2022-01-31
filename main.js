@@ -178,13 +178,34 @@ $(document).ready(() => {
     }
   }
 
-  async function LoadWords() {
+  async function LoadWordStrokes() {
+    const idb_key = "word_stroke";
+
+    let json_object = await idbKeyval.get(idb_key);
+    if (typeof json_object !== "undefined") {
+      console.log("Found cache in IndexedDB, return it");
+      return json_object;
+    }
+
+    console.log("Cannot load cache, downloding from server.");
     const request = new Request("./word_stroke.json");
+    const response = await fetch(request);
+    json_object = await response.json();
+
+    try {
+      await idbKeyval.set(idb_key, json_object);
+    } catch (error) {
+      console.error("Failed to cache word_stroke in IndexDB", error);
+    }
+    return json_object;
+  }
+
+  async function InitGame() {
     const form = $("#form-guess");
     form.hide();
+
     try {
-      const response = await fetch(request);
-      const json_object = await response.json();
+      const json_object = await LoadWordStrokes();
 
       for (word in json_object) {
         const stroke_list = json_object[word];
@@ -239,7 +260,7 @@ $(document).ready(() => {
 
     $("#invalid-message").hide();
     $("#dialog-help").modal("show");
-    LoadWords();
+    InitGame();
   }
 
   OnDocumentReady();
