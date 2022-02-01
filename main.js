@@ -14,6 +14,11 @@ $(document).ready(() => {
   var GUESS_HISTORY = [];
   var RESULT_HISTORY = [];
 
+  const SETTINGS_LOCAL_STORAGE_KEY = "settings";
+  var SETTINGS = {
+    show_stroke: true,
+  };
+
   const ShowWarningMessage = (message) => {
     $("#invalid-message").text(message);
     $("#invalid-message").show();
@@ -44,7 +49,9 @@ $(document).ready(() => {
         pixel_count++;
       }
     }
-    context.stroke(path);
+    if (SETTINGS.show_stroke) {
+      context.stroke(path);
+    }
 
     if (guess === ANSWER) {
       context.beginPath();
@@ -169,6 +176,8 @@ $(document).ready(() => {
       game_data = {};
     }
 
+    GUESS_HISTORY = [];
+    RESULT_HISTORY = [];
     if (game_data.ANSWER !== ANSWER) {
       SaveGame();
     } else {
@@ -200,9 +209,49 @@ $(document).ready(() => {
     return json_object;
   }
 
+  function LoadSettings() {
+    if (typeof Storage === "undefined") return;
+
+    let stored_settings;
+    try {
+      stored_settings = JSON.parse(localStorage[SETTINGS_LOCAL_STORAGE_KEY]);
+    } catch (error) {
+      stored_settings = {};
+    }
+
+    for (let key in stored_settings) {
+      if (key in SETTINGS) {
+        SETTINGS[key] = stored_settings[key];
+      }
+    }
+
+    $("#settings-show-stroke").prop("checked", SETTINGS.show_stroke);
+
+    localStorage.setItem(SETTINGS_LOCAL_STORAGE_KEY, JSON.stringify(SETTINGS));
+  }
+
+  function UpdateSettings() {
+    let need_redraw = false;
+    if (SETTINGS.show_stroke !== $("#settings-show-stroke").prop("checked")) {
+      SETTINGS.show_stroke = $("#settings-show-stroke").prop("checked");
+      need_redraw = true;
+    }
+
+    if (typeof Storage !== "undefined") {
+      localStorage.setItem(SETTINGS_LOCAL_STORAGE_KEY, JSON.stringify(SETTINGS));
+    }
+
+    if (need_redraw) {
+      $("#result").empty();
+      InitGame();
+    }
+  }
+
   async function InitGame() {
+    LoadSettings();
     const form = $("#form-guess");
     form.hide();
+    $("#message").hide();
 
     try {
       const json_object = await LoadWordStrokes();
@@ -255,8 +304,20 @@ $(document).ready(() => {
       $("#message").show();
     });
 
-    $("#button-start").click(() => $("#dialog-help").modal("hide"));
     $("#button-help").click(() => $("#dialog-help").modal("show"));
+
+    $("#dialog-settings").modal({
+      onDeny: () => {
+        $("#settings-show-stroke").prop("checked", SETTINGS.show_stroke);
+        return true;
+      },
+      onApprove: () => {
+        UpdateSettings();
+      }
+    }).modal("hide");
+    $("#button-settings").click(() => {
+      $("#dialog-settings").modal("show");
+    });
 
     $("#invalid-message").hide();
     $("#dialog-help").modal("show");

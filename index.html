@@ -68,16 +68,19 @@
         font-size: 2rem;
       }
 
-
-      #dialog-help .header {
+      #dialog-help .header, #dialog-settings .header {
         font-size: 4rem;
       }
 
-      #dialog-help * {
+      #dialog-help .actions *, #dialog-settings .actions * {
+        font-size: 1.5rem;
+      }
+
+      #dialog-help .content *, #dialog-settings .content * {
         font-size: 3rem;
       }
 
-      #dialog-help {
+      #dialog-help, #dialog-settings {
         width: 100%;
       }
 
@@ -85,8 +88,6 @@
         font-size: 2rem;
       }
     }
-
-
 
     #game>div {
       width: 100%;
@@ -104,16 +105,19 @@
     <div id='game'>
       <div class="ui four column centered grid">
         <div class="row">
-          <div class="left floated left aligned column">
-            <button id="button-help" class="ui icon instagram button">
+          <div class="left aligned column">
+            <button id="button-help" class="ui small icon instagram button">
               <i class="question icon"></i>
             </button>
           </div>
           <div class="eight wide column">
-            <h1 id='title'>國字刮刮樂</h1>
+            <h1 id="title">國字刮刮樂</h1>
           </div>
-          <div class="right floated right aligned column">
-            <div class="right floated right aligned column">
+          <div class="right aligned column">
+            <div class="ui small icon buttons">
+              <button id="button-settings" class="ui icon instagram button">
+                <i class="cog icon"></i>
+              </button>
               <button id="button-share" class="ui icon instagram button">
                 <i class="share square icon"></i>
               </button>
@@ -162,10 +166,32 @@
         <p><small>筆順資料來源：<a href='https://stroke-order.learningweb.moe.edu.tw/home.do'
               target=_blank>國字標準字體筆順學習網</a></small>
         </p>
-        <div>
+      </div>
+      <div class="actions">
+        <div id="button-start" class="ui instagram ok button">Start</div>
+      </div>
+    </div>
+
+    <div id="dialog-settings" class="ui tiny modal" style="margin-left: auto; margin-right: auto;">
+      <div class="header">
+        設定
+      </div>
+      <div class="content">
+        <div class="ui toggle checkbox">
+          <input type="checkbox" id="settings-show-stroke">
+          <label>顯示輸入字的外框</label>
         </div>
       </div>
-      <div id="button-start" class="ui bottom attached blue button">Start</div>
+      <div class="actions">
+        <div class="ui red cancel button">
+          <i class="remove icon"></i>
+          取消
+        </div>
+        <div class="ui green ok button">
+          <i class="checkmark icon"></i>
+          確認
+        </div>
+      </div>
     </div>
   </div>
 </body>
