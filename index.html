@@ -10,17 +10,21 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/idb-keyval@6/dist/umd.js"></script>
 
-  <script src='./main.js'></script>
+  <script src="./main.js"></script>
 
-  <template id='template-guess'>
-    <div class='row'>
-      <div class='box'>
-        <canvas id='canvas' class="ui medium rounded image" width=256 height=256></canvas>
+  <template id="template-guess">
+    <div class="row">
+      <div class="box">
+        <canvas id="canvas" class="ui medium rounded image" width=256 height=256></canvas>
       </div>
     </div>
   </template>
 
   <style>
+    :root {
+      --max-width: 400px;
+    }
+
     .box {
       display: block;
       margin-bottom: 10px;
@@ -47,17 +51,36 @@
       margin: 0 auto;
       margin-top: 20px;
       width: 100%;
-      max-width: 400px;
+      max-width: var(--max-width);
       text-align: center;
     }
 
+    #game>div {
+      width: 100%;
+      max-width: var(--max-width);
+    }
+
+    #text-input {
+      width: 100%;
+    }
+
+    #menu {
+      max-width: var(--max-width);
+    }
+
+    #menu.fixed {
+      position: fixed;
+      background: white;
+      box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
+    }
+
     @media only screen and (max-width: 992px) {
-      body {
-        font-size: 2rem;
+      :root {
+        --max-width: 800px;
       }
 
-      #game {
-        max-width: 800px;
+      body {
+        font-size: 2rem;
       }
 
       #game #title {
@@ -89,22 +112,14 @@
       }
     }
 
-    #game>div {
-      width: 100%;
-      max-width: 800px;
-    }
-
-    #text-input {
-      width: 100%;
-    }
   </style>
 </head>
 
 <body>
   <div class="ui container">
-    <div id='game'>
+    <div id="game">
       <div class="ui four column centered grid">
-        <div class="row">
+        <div class="row" id="menu">
           <div class="left aligned column">
             <button id="button-help" class="ui small icon instagram button">
               <i class="question icon"></i>
@@ -126,7 +141,7 @@
         </div>
         <div class="row">
           <div class="sixteen wide column">
-            <div id='result'>
+            <div id="result">
             </div>
           </div>
         </div>
@@ -145,7 +160,17 @@
           </div>
         </div>
       </div>
-      <div id='message'>資料載入中...</div>
+      <div class="ui message" id="message">資料載入中...</div>
+      <div class="ui positive message" id="message-correct-answer" style="display: none;">
+        <div class="header">
+          恭喜你答對了!
+        </div>
+        <p>想更認識這個字嗎？看看
+          <a id="dict-link" href="#" target="_blank">
+            國語辭典
+          </a>裡的相關條目吧！
+        </p>
+      </div>
     </div>
 
     <div id="dialog-help" class="ui tiny modal" style="margin-left: auto; margin-right: auto;">
@@ -163,7 +188,7 @@
         <p>輸入的中文字必須是<a href='
             https://language.moe.gov.tw/result.aspx?classify_sn=23&subclassify_sn=437&content_sn=46'
             target=_blank>教育部常用字</a>，並且有筆畫數限制。</p>
-        <p><small>筆順資料來源：<a href='https://stroke-order.learningweb.moe.edu.tw/home.do'
+        <p><small>筆順資料來源：<a href="https://stroke-order.learningweb.moe.edu.tw/home.do"
               target=_blank>國字標準字體筆順學習網</a></small>
         </p>
       </div>

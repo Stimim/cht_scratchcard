@@ -115,6 +115,8 @@ $(document).ready(() => {
 
   function Guess(guess) {
     const message_element = $("#message");
+    message_element.hide();
+
     if (guess in STROKE_MAP) {
       if (COULD_BE_ANSWER.indexOf(guess) < 0) {
         ShowWarningMessage(`「${guess}」筆順超過 ${MAX_STROKE} 畫。`);
@@ -134,8 +136,11 @@ $(document).ready(() => {
     $(clone).css({opacity: 0}).appendTo(div_result).animate({opacity: 1});
 
     if (guess === ANSWER) {
-      message_element.text("恭喜你答對了！");
-      message_element.show();
+      const div = $("#message-correct-answer");
+      $("#dict-link").prop(
+        "href",
+        `https://dict.revised.moe.edu.tw/search.jsp?md=1&word=${ANSWER}`);
+      div.show();
       GUESS_HISTORY.push(guess);
       RESULT_HISTORY.push("100%");
       SaveGame();
@@ -251,7 +256,6 @@ $(document).ready(() => {
     LoadSettings();
     const form = $("#form-guess");
     form.hide();
-    $("#message").hide();
 
     try {
       const json_object = await LoadWordStrokes();
@@ -319,6 +323,9 @@ $(document).ready(() => {
       $("#dialog-settings").modal("show");
     });
 
+    $("#menu").visibility({
+      type: "fixed",
+    });
     $("#invalid-message").hide();
     $("#dialog-help").modal("show");
     InitGame();
