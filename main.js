@@ -302,7 +302,8 @@ $(document).ready(() => {
     });
 
     $("#button-share").click(() => {
-      const text = `${TODAY}\n${RESULT_HISTORY.join("\n")}\n${location.href}`;
+      const href = `${location.origin}${location.pathname}`;
+      const text = `${TODAY}\n${RESULT_HISTORY.join("\n")}\n${href}`;
       navigator.clipboard.writeText(text);
       $("#message").text("遊戲歷程已複製到剪貼簿");
       $("#message").show();
